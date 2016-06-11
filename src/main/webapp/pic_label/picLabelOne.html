@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>一级分类</title>
+    <link href="js/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <script src="js/jquery/dist/jquery.min.js"></script>
+    <script src="js/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script src="js/keymaster-master/keymaster.js"></script>
+    <style>
+        html,body{
+            font-size: medium;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="col-lg-12">
+            <h1 style="margin-left: 20px">
+                视频-图片标注系统.
+            </h1>
+            <p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;熟悉规则(见右下列表)，通过快捷键标注，规则如下：
+                按下快捷键后，系统自动加载下一张图片，并后台自动对该图片进行标注。注意：刷新页面，系统会重新分配任务。
+            </p>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="col-lg-8" style="margin-top: 20px">
+            <img id="image" class="img-rounded" style="width: 100%;height: 100%"/>
+            <p id="message" style="margin-top: 10px;" align="center"></p>
+        </div>
+        <div class="col-lg-4">
+            <h3>
+                一级分类
+            </h3>
+            <ul>
+                <li>
+                    射门q： 球进门之前，球员有射门动作
+                </li>
+                <li>
+                    进球w： 球必须在门内
+                </li>
+                <li>
+                    开场e： 双方队员列队整齐
+                </li>
+                <li>
+                    点球r:  球员站在点球点前，助跑开始的那个瞬间
+                </li>
+                <li>
+                    任意球t:  球员站在足球前，助跑开始的那个瞬间
+                </li>
+                <li>
+                    其他sapce:  不属于以上动作的都归于其他
+                </li>
+            </ul>
+            <h3>备注</h3>
+            <ul>
+                <li>如果点球射门或者任意球射门后，球进门了，进球画面就可以标注为“进球”。</li>
+                <li>进球”的视频往往持续2-3秒，拆分成为0.5秒一张的图片后，可以有多张图片被标注为进球。</li>
+                <li>射门”动作要求必须在球进门之前，最准确的“射门”动作是在运动员脚接触球的那个瞬间，但是由于每0.5秒拆分出一张图片，从图片上看，在触球前后0.5秒内的图片都可以标注为“射门”，只要球还没有进门</li>
+
+            </ul>
+
+        </div>
+    </div>
+</div>
+</body>
+
+    <script>
+
+        //一个是文件夹名字，另一个是此文件夹下的图片名字集合
+        var filename;
+        var names;
+        //记录标号，方便通知后台需要释放哪个文件夹
+        var number = -1;
+
+        //向后台发送请求，获取该用户需要标注的文件夹
+        $(document).ready(function () {
+
+            $.ajax({
+                type:'post',
+                url:'getFileAction',
+                data:null,
+                dataType:'json'
+            }).then(function (data) {
+
+                var fileobject = $.parseJSON(data);
+                if(fileobject!=null){
+                    filename = fileobject.filename;
+                    names = fileobject.picnames;
+                    number = fileobject.number;
+
+                    //这里需要修改img的src元素
+                    var path = 'img/'+filename+'/'+names[0];
+                    $("#image").attr("src",path);
+
+
+                    //显示这次任务的具体信息
+                    $("#message").html("本次任务图片数量："+names.length+"张  已完成：0张");
+                }else {
+                    alert("暂时没有任务，休息会吧！");
+                }
+            })
+        });
+
+
+        //用来切换到下一张
+        var num=0;
+        var firstkey;
+
+        key('q,w,e,r,t,space', function(event,handler) {
+            firstkey = handler.shortcut;
+            console.log(firstkey);
+            postKey();
+        });
+
+        //快捷键的值传给后台
+        function postKey(){
+            $.ajax({
+                type:'post',
+                url:'postkeyCodeAction',
+                data:{
+                    filename:filename,
+                    name:names[num],
+                    keyCode:firstkey,
+                    category:1
+                },
+                dataType:'json'
+            }).then(function () {
+                //加载下一张图片
+                num++;
+                var path = 'img/'+filename+'/'+names[num];
+                $("#image").attr("src",path);
+
+                //显示这次任务的具体信息
+                $("#message").html("本次任务图片数量："+names.length+"张  已完成："+num+"张");
+
+                //如果本次任务图片全部标注完成，通知后台该文件夹状态为2
+                if(num >= names.length){
+                    $.ajax({
+                        type:'post',
+                        url:'taskStateAction',
+                        data:{
+                            state:2,
+                            number:number,
+                            category:1
+                        },
+                        dataType:'json'
+                    }).then(function(){
+                        alert("本次任务已全部完成，休息会吧！");
+                        number = -1;
+                        location.reload();
+                    })
+                }
+            });
+        }
+
+
+
+        var islost=false;
+        //浏览器关闭刷新，关闭时，通知后台改修该文件夹的状态为0
+        //当用户没点击确认是否移开时，所有操作都是暂定的，所以不用担心seInterval操作。
+        $(window).on('beforeunload', function() {
+            if (number != -1) {
+                $.ajax({
+                    type: 'post',
+                    url: 'taskStateAction',
+                    data: {
+                        state: 0,
+                        number: number,
+                        count: num,
+                        category: 1
+                    },
+                    dataType: 'json'
+                }).then(function () {
+                    islost = true;
+                });
+                return "";
+            }
+        });
+
+        //不停的告诉后台我这个文件夹仍在使用
+        setInterval(function () {
+            //把该文件夹的状态改回来
+            if (islost == true) {
+                $.ajax({
+                    type: 'post',
+                    url: 'taskStateAction',
+                    data: {
+                        state: 1,
+                        number: number,
+                        count:num,
+                        category: 1
+                    },
+                    dataType: 'json'
+                }).then(function () {
+                    islost = false;
+                },function () {
+                    alert("当前任务已被人抢去！,点击系统重新分配任务");
+                    number = -1;
+                    location.reload();
+                });
+            }
+        },1000);
+
+    </script>
+</html>

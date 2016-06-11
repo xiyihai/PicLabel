@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+ <struts>
+ 	<constant name="struts.enable.DynamicMethodInvocation" value="false" />  
+    <constant name="struts.devMode" value="true" /> 
+    
+    <package name="PicSystem" namespace='' extends="json-default">
+ 
+  		<!--  用户选择还未被选中的文件夹 -->
+        <action name="getFileAction" class="actions.OptFileAction">
+       		<result type="json">
+       			<param name="root">fileInfo</param>
+       		</result>
+        </action>
+       
+       <!--  用户选择还未被选中的文件夹 -->
+        <action name="get2FileAction" class="actions.Opt2FileAction">
+       		<result type="json">
+       			<param name="root">fileInfo</param>
+       		</result>
+        </action>
+       
+        <!-- 前端把快捷键值和文件夹名字，图片名字传给后台  -->
+        <action name="postkeyCodeAction" class="actions.MvFileAction">
+       		<result name="success"  type="json"></result>
+      		<result name="error"></result>
+        </action>
+        
+         <!-- 前端修改文件夹的状态  -->
+        <action name="taskStateAction" class="actions.TaskStateAction">
+       		<result name="success"  type="json"></result>
+      		<result name="error"></result>
+        </action>
+        
+        
+        <action name="*">
+    		<result>pic_label/index.html</result>
+        </action>
+        
+    </package>
+
+   
+</struts>

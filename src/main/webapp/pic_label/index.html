@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>标注系统</title>
+    <link href="pic_label/js/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <script src="pic_label/js/jquery/dist/jquery.min.js"></script>
+    <script src="pic_label/js/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script src="pic_label/js/slides-playing/jquery.slides.min.js"></script>
+    <style>
+        html,body{
+            font-size: medium;
+        }
+    </style>
+
+    <style>
+        #slides {
+            display: none
+        }
+        #slides .slidesjs-navigation {
+            margin-top:5px;
+        }
+        a.slidesjs-next,
+        a.slidesjs-previous,
+        a.slidesjs-play,
+        a.slidesjs-stop {
+            background-image: url(pic_label/pic_index/btns-next-prev.png);
+            background-repeat: no-repeat;
+            display:block;
+            width:12px;
+            height:18px;
+            overflow: hidden;
+            text-indent: -9999px;
+            float: left;
+            margin-right:5px;
+        }
+
+        a.slidesjs-next {
+            margin-right:10px;
+            background-position: -12px 0;
+        }
+
+        a:hover.slidesjs-next {
+            background-position: -12px -18px;
+        }
+
+        a.slidesjs-previous {
+            background-position: 0 0;
+        }
+
+        a:hover.slidesjs-previous {
+            background-position: 0 -18px;
+        }
+
+        a.slidesjs-play {
+            width:15px;
+            background-position: -25px 0;
+        }
+
+        a:hover.slidesjs-play {
+            background-position: -25px -18px;
+        }
+
+        a.slidesjs-stop {
+            width:18px;
+            background-position: -41px 0;
+        }
+
+        a:hover.slidesjs-stop {
+            background-position: -41px -18px;
+        }
+
+        .slidesjs-pagination {
+            margin: 7px 0 0;
+            float: right;
+            list-style: none;
+        }
+
+        .slidesjs-pagination li {
+            float: left;
+            margin: 0 1px;
+        }
+
+        .slidesjs-pagination li a {
+            display: block;
+            width: 13px;
+            height: 0;
+            padding-top: 13px;
+            background-image: url(pic_label/pic_index/pagination.png);
+            background-position: 0 0;
+            float: left;
+            overflow: hidden;
+        }
+
+        .slidesjs-pagination li a.active,
+        .slidesjs-pagination li a:hover.active {
+            background-position: 0 -13px
+        }
+
+        .slidesjs-pagination li a:hover {
+            background-position: 0 -26px
+        }
+
+        #slides a:link,
+        #slides a:visited {
+            color: #333
+        }
+
+        #slides a:hover,
+        #slides a:active {
+            color: #9e2020
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="col-lg-12">
+            <h1 style="margin-left: 20px">
+                视频-图片标注系统.
+            </h1>
+            <p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;足球视频标注是将足球比赛过程中的动作，采用人工标注的方法进行标注，用于对足球视频分析的深度学习。
+                一场正式足球比赛时间是90分钟，往往有3-6个摄像头机位在进行视频录像，所以，总共产生3-6个90分钟的足球视频。
+                将这些足球视频以每0.5秒左右的间隔产生图片，针对每张图片，从“足球动作”与“视频机位”两个维度进行标注。
+            </p>
+            <p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;熟悉规则，针对每一张图片进行两大分类标注，一级分类动作，二级分类机位，请选择不同任务:
+
+                <a href="pic_label/picLabelOne.html">一级分类</a>
+
+                <a href="pic_label/picLabelTwo.html">二级分类</a>
+            </p>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="col-lg-8" style="margin-top: 10px">
+            <div id="slides">
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h3 id="explain"></h3>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+
+    var explain = ["射门+1号机位","进球+3号机位","进球+4号机位","开场+5号机位","点球射门+1号机位",
+    "点球射门+3号机位","任意球射门+特写","射门+4号机位"];
+
+    $(function(){
+
+        for(var i=1;i<9;i++){
+            $("#slides").append("<img src='pic_label/pic_index/"+i+"q.jpg' class='img-rounded'/>");
+        }
+
+        $("#slides").slidesjs({
+            play: {
+                active: true,
+                auto: true,
+                interval: 2000,
+                swap: true
+            },
+            callback: {
+                loaded: function (number) {
+                    $('#explain').html(explain[number-1]);
+                },
+                complete: function(number){
+                    $('#explain').html(explain[number-1]);
+                }
+            }
+        });
+    });
+</script>
+</html>
