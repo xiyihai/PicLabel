@@ -16,7 +16,14 @@ public class MvFileAction extends ActionSupport{
 	private String name;
 	private String keyCode;
 	private int category;
+	private int number;
 	
+	public int getNumber() {
+		return number;
+	}
+	public void setNumber(int number) {
+		this.number = number;
+	}
 	public int getCategory() {
 		return category;
 	}
@@ -55,6 +62,17 @@ public class MvFileAction extends ActionSupport{
 			picPath = OptFileAction.filepath+File.separator+filename+File.separator+name;
 			mvPath = OptFileAction.basepath+File.separator+"pic_label"+File.separator+"labels"+
 					File.separator+keyCode+File.separator+"pic2"+File.separator+name;
+			
+			//需要判断移入新的图片，能否让之前(二类)state为2的文件夹复苏为0，这样才能继续二类标注
+			for(int i=0;i<Opt2FileAction.imgs.length;i++){
+				if (Opt2FileAction.imgs[i].getName().equals(keyCode) && Opt2FileAction.arrays[i] == 2) {
+					Opt2FileAction.arrays[i] = 0;
+					logger.warn("由于新加入图片导致(二类)文件夹从状态2复苏为0,文件夹名称："+keyCode);
+					logger.error("(二类)文件夹状态改变如下：  "+"文件夹名称:"+Opt2FileAction.imgs[i].getName()+",修改状态为：0");
+					break;
+				}
+			}
+			
 		}else {
 			picPath = Opt2FileAction.filepath+File.separator+filename+File.separator+"pic2"+File.separator+name;
 			mvPath = Opt2FileAction.basepath+File.separator+"pic_label"+File.separator+"labels"+
