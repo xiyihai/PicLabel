@@ -65,7 +65,7 @@ public class PicNameProcess {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		System.out.println("begin==============================="+new Date().getMinutes());
-		new PicNameProcess().pic_name_converter("E:/足球比赛视频/new_video/video-pic-conventer");
+		new PicNameProcess().pic_name_converter("E:/video-pic-conventer");
 		//new PicNameProcess().pic_name_syn("E:/足球比赛视频/pic");
 		System.out.println("success==============================="+new Date().getMinutes());
 	}
