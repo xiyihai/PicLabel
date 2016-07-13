@@ -38,7 +38,6 @@ public class PicNameProcess {
 		//获取目录下的所有文件夹，这里注意出现的顺序不是磁盘顺序,而是数字顺序  809在9之前出现
 		File[] dir_files = source_dir.listFiles();
 		
-		
 		for(int i=0;i<dir_files.length;i++){
 			
 			File newname_dir = new File(source+File.separator+String.valueOf(i));
