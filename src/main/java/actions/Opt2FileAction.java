@@ -39,11 +39,12 @@ public class Opt2FileAction extends ActionSupport {
 		public boolean accept(File dir, String name) {
 			// TODO Auto-generated method stub
 			//主要用来过滤 space文件夹
-			if(!name.equals("space")){
+			/*if(!name.equals("space")){
 				return true;
 			}else {
 				return false;	
-			}
+			}*/
+			return true;
 		}
 	});
 	
